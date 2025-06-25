@@ -1,45 +1,44 @@
-## Brain Tumor Detection using Deep Learning
+# Brain Tumor Detection using Deep Learning
 This project focuses on detecting brain tumors from MRI scan images using Convolutional Neural Networks (CNN) implemented in TensorFlow. Accurate and early detection of brain tumors is a crucial step in the treatment process, and this project demonstrates a deep learning approach for automated classification.
 
-# Project Structure
+## Project Structure
 bash
 Copy
 Edit
-
-brain-tumor-detection/
+```brain-tumor-detection/
 │
-├── brain-tumor.ipynb     
-├── dataset/                
+├── brain-tumor.ipynb                    
 └── README.md               
+```
 
 
-# Features
+## Features
 ✅ Image Preprocessing using OpenCV and PIL
 ✅ Deep Learning model built with TensorFlow
 ✅ Classification of MRI images into Tumor / No Tumor
 ✅ Visualizations of data and results
 ✅ Easy-to-follow notebook structure
 
-# Technologies Used
+## Technologies Used
 - Python
 - NumPy, Pandas
 - OpenCV, PIL
 - TensorFlow, Keras
 - Matplotlib
 
-# 📦 Dataset
+## 📦 Dataset
 Kaggle Brain Tumor Dataset
 
-# 📊 Results
+## 📊 Results
 - The notebook provides:
 - Image samples with and without tumors
 - Model training and evaluation metrics
 - Accuracy and loss visualizations
 
-# 📄 License
+## 📄 License
 This project is for educational and research purposes only.
 
-# Author
+## Author
 eyad qasim
 
 [LinkedIn Profile](https://www.linkedin.com/in/eyad-qasim-2a96b624b/)
