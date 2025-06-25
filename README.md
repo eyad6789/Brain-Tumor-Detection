@@ -5,6 +5,7 @@ This project focuses on detecting brain tumors from MRI scan images using Convol
 bash
 Copy
 Edit
+
 brain-tumor-detection/
 │
 ├── brain-tumor.ipynb     
