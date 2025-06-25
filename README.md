@@ -26,19 +26,20 @@ brain-tumor-detection/
 - TensorFlow, Keras
 - Matplotlib
 
-# Dataset
-- You can use publicly available datasets such as:
-- Kaggle Brain Tumor Dataset
-- Place the dataset inside a folder named dataset/ at the root level of this project.
+# 📦 Dataset
+Kaggle Brain Tumor Dataset
 
-Results
+# 📊 Results
 - The notebook provides:
 - Image samples with and without tumors
 - Model training and evaluation metrics
 - Accuracy and loss visualizations
 
+# 📄 License
+This project is for educational and research purposes only.
+
 # Author
-Your Name
+eyad qasim
 
 [LinkedIn Profile](https://www.linkedin.com/in/eyad-qasim-2a96b624b/)
 
