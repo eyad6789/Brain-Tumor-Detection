@@ -40,9 +40,9 @@ Results
 # Author
 Your Name
 
-LinkedIn Profile
+[LinkedIn Profile](https://www.linkedin.com/in/eyad-qasim-2a96b624b/)
 
-GitHub Profile
+[GitHub Profile](https://github.com/eyad6789)
 
 
 
