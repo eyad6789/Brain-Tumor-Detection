@@ -39,11 +39,7 @@ Kaggle Brain Tumor Dataset
 This project is for educational and research purposes only.
 
 ## Author
-eyad qasim
-
+Developed by "Eyad Qasim Raheem" 
 [LinkedIn Profile](https://www.linkedin.com/in/eyad-qasim-2a96b624b/)
 
 [GitHub Profile](https://github.com/eyad6789)
-
-
-
