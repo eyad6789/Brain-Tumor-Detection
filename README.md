@@ -7,7 +7,7 @@ Copy
 Edit
 ```brain-tumor-detection/
 │
-├── brain-tumor.ipynb                    
+├── brain-tumor.ipynb   # all code here                 
 └── README.md               
 ```
 
