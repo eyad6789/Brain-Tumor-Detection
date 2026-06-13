@@ -1,0 +1,17 @@
+# Backend API dependencies for the brain-tumor classifier.
+# Install into the existing project venv:  pip install -r backend/requirements.txt
+#
+# NOTE: torch / torchvision are intentionally NOT pinned/bumped here — keep the
+# versions already in venv/ (the runtime model_class.pth was saved under).
+# This project was developed against torch 2.6.0 / torchvision 0.21.0.
+
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9     # required for multipart/form-data uploads (/api/predict)
+pillow>=10
+numpy>=1.26
+
+# ─── Optional (features degrade gracefully if absent) ──────────────────────────
+grad-cam>=1.5               # enables the GradCAM heatmap; absent -> resized original
+ollama>=0.3                 # enables the local Meditron report; absent -> install hint
+opencv-python-headless>=4   # pulled in by grad-cam (cv2)

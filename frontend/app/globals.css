@@ -1,0 +1,329 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (next-themes toggles `.dark` on <html>). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────────────────────── Design tokens → utilities ─────────────────────────
+   Map switchable CSS variables to Tailwind color/font utilities. `inline` makes
+   generated utilities reference the var() directly, so they respond to `.dark`. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-strong: var(--ink-strong);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --color-safe: var(--safe);
+  --color-alert: var(--alert);
+  --color-glioma: var(--c-glioma);
+  --color-meningioma: var(--c-meningioma);
+  --color-pituitary: var(--c-pituitary);
+  --color-notumor: var(--c-notumor);
+
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", ui-sans-serif, sans-serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+}
+
+/* ───────────────────────── Light theme (clinical lab) ──────────────────────── */
+:root {
+  --bg: #eef2f8;
+  --surface: #ffffff;
+  --surface-2: #f4f7fb;
+  --surface-3: #e8eef6;
+  --line: #d8e0ec;
+  --line-strong: #c2cee0;
+  --ink: #28323f;
+  --ink-strong: #0c141f;
+  --muted: #6a7686;
+  --primary: #0891a8;        /* clinical cyan-teal */
+  --primary-soft: #d6f0f3;
+  --accent: #5b54e6;         /* indigo-violet */
+  --safe: #128a5b;
+  --alert: #c9711a;
+
+  --c-glioma: #e11d62;
+  --c-meningioma: #6d52e6;
+  --c-pituitary: #c9711a;
+  --c-notumor: #128a5b;
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(193, 206, 224, 0.7);
+  --grid-line: rgba(16, 36, 64, 0.045);
+  --shadow-card: 0 1px 2px rgba(15, 28, 48, 0.06), 0 14px 38px -22px rgba(15, 28, 48, 0.28);
+  --glow: 0 0 0 0 transparent;
+  --scan-color: rgba(8, 145, 168, 0.5);
+  --mesh-1: rgba(8, 145, 168, 0.1);
+  --mesh-2: rgba(91, 84, 230, 0.08);
+}
+
+/* ───────────────────────── Dark theme (reading room) ──────────────────────── */
+.dark {
+  --bg: #06080f;
+  --surface: #0b101d;
+  --surface-2: #0f1626;
+  --surface-3: #151e31;
+  --line: rgba(150, 168, 196, 0.13);
+  --line-strong: rgba(150, 168, 196, 0.26);
+  --ink: #c5d2e3;
+  --ink-strong: #f2f6fc;
+  --muted: #7e8da4;
+  --primary: #2cd4ee;        /* cyan glow */
+  --primary-soft: rgba(44, 212, 238, 0.14);
+  --accent: #8b7bff;         /* violet */
+  --safe: #34d39a;
+  --alert: #f3b740;
+
+  --c-glioma: #fb6f97;
+  --c-meningioma: #a78bff;
+  --c-pituitary: #f3b740;
+  --c-notumor: #34d39a;
+
+  --glass-bg: rgba(13, 19, 34, 0.55);
+  --glass-border: rgba(44, 212, 238, 0.16);
+  --grid-line: rgba(150, 170, 200, 0.06);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.02), 0 24px 60px -30px rgba(0, 0, 0, 0.8);
+  --glow: 0 0 32px rgba(44, 212, 238, 0.18), 0 0 70px rgba(139, 123, 255, 0.1);
+  --scan-color: rgba(44, 212, 238, 0.7);
+  --mesh-1: rgba(44, 212, 238, 0.13);
+  --mesh-2: rgba(139, 123, 255, 0.12);
+}
+
+/* ───────────────────────────── Base ───────────────────────────── */
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--bg);
+  }
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
+    background-clip: padding-box;
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ──────────────────────── Atmosphere / textures ──────────────────────── */
+/* Fine graph-paper grid + a soft radiological glow mesh at the top. */
+.app-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(120% 80% at 12% -10%, var(--mesh-1), transparent 55%),
+    radial-gradient(120% 80% at 92% -20%, var(--mesh-2), transparent 50%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 46px 46px, 46px 46px;
+  background-position: 0 0, 0 0, -1px -1px, -1px -1px;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%);
+}
+
+/* Subtle film grain for depth (mostly visible in dark mode). */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+/* ──────────────────────────── Components ──────────────────────────── */
+.panel {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-card);
+}
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid var(--glass-border);
+}
+.glow {
+  box-shadow: var(--glow);
+}
+.hairline {
+  border: 1px solid var(--line);
+}
+
+/* Mono "instrument readout" text */
+.data {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1, "zero" 1;
+  letter-spacing: -0.01em;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.text-gradient {
+  background: linear-gradient(100deg, var(--ink-strong) 0%, var(--primary) 60%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Corner reticle ticks (instrument framing). Pair with `position: relative`. */
+.ticks > span {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--primary);
+  opacity: 0.55;
+}
+.ticks > span:nth-child(1) { top: 7px; left: 7px; border-top: 1.5px solid; border-left: 1.5px solid; }
+.ticks > span:nth-child(2) { top: 7px; right: 7px; border-top: 1.5px solid; border-right: 1.5px solid; }
+.ticks > span:nth-child(3) { bottom: 7px; left: 7px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+.ticks > span:nth-child(4) { bottom: 7px; right: 7px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+/* ──────────────────────────── Markdown ──────────────────────────── */
+.markdown {
+  color: var(--ink);
+  font-size: 0.925rem;
+  line-height: 1.7;
+}
+.markdown > :first-child { margin-top: 0; }
+.markdown h1, .markdown h2, .markdown h3 {
+  font-family: var(--font-display);
+  color: var(--ink-strong);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.markdown h1 { font-size: 1.3rem; margin: 1.4em 0 0.5em; }
+.markdown h2 {
+  font-size: 1.05rem;
+  margin: 1.5em 0 0.55em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--line);
+}
+.markdown h3 { font-size: 0.95rem; margin: 1.2em 0 0.4em; }
+.markdown p { margin: 0.7em 0; }
+.markdown strong { color: var(--ink-strong); font-weight: 600; }
+.markdown a { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+.markdown ul, .markdown ol { margin: 0.6em 0; padding-left: 1.3em; }
+.markdown li { margin: 0.3em 0; }
+.markdown ul li::marker { color: var(--primary); }
+.markdown code {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  background: var(--surface-3);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 0.1em 0.4em;
+}
+.markdown pre {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.9em 1em;
+  overflow-x: auto;
+  margin: 0.8em 0;
+}
+.markdown pre code { background: none; border: none; padding: 0; }
+.markdown blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1em;
+  margin: 0.8em 0;
+  color: var(--muted);
+}
+.markdown hr { border: none; border-top: 1px solid var(--line); margin: 1.2em 0; }
+
+/* ──────────────────────────── Animations ──────────────────────────── */
+@keyframes scan-y {
+  0% { transform: translateY(-10%); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateY(1100%); opacity: 0; }
+}
+@keyframes sweep-x {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(320%); }
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes dash-move {
+  to { stroke-dashoffset: -1000; }
+}
+
+.animate-scan { animation: scan-y 2.1s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.animate-pulse-soft { animation: pulse-soft 1.8s ease-in-out infinite; }
+.animate-fade-up { animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Skeleton shimmer block */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-3);
+  border-radius: 8px;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--glass-bg), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-scan { display: none; }
+}

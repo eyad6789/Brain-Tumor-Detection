@@ -24,55 +24,55 @@ try:
 except ImportError:
     OLLAMA_AVAILABLE = False
 
-OLLAMA_MODEL = "meditron"
+# Configurable via the OLLAMA_MODEL env var. Defaults to a small instruct model
+# that runs comfortably on modest GPUs (~4 GB VRAM) and formats reports cleanly.
+# Set OLLAMA_MODEL=meditron (and `ollama pull meditron`) for the medical 7B model
+# (slower on small GPUs), or any other pulled model.
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:1.5b-instruct-q4_K_M")
+# Cap output length (smaller = faster, esp. on CPU). Override with OLLAMA_NUM_PREDICT.
+NUM_PREDICT = int(os.environ.get("OLLAMA_NUM_PREDICT", "520"))
+
+
+def _strip_code_fence(text):
+    """Some models wrap the whole answer in a ```markdown ... ``` block, which
+    would render as a literal code block. Unwrap a single enclosing fence."""
+    t = text.strip()
+    if t.startswith("```"):
+        nl = t.find("\n")
+        if nl != -1 and t[3:nl].strip().lower() in ("markdown", "md", ""):
+            body = t[nl + 1 :]
+            if body.rstrip().endswith("```"):
+                body = body.rstrip()[:-3]
+            return body.strip()
+    return text
 
 _SYSTEM_PROMPT = (
-    "You are Meditron, a medical AI assistant trained on clinical guidelines, "
-    "PubMed abstracts, and medical textbooks. You help explain brain MRI findings "
-    "in clear, compassionate language for both patients and clinicians. "
-    "Always remind the user that your output is not a substitute for professional diagnosis."
+    "You are a careful clinical AI assistant that explains brain-MRI findings in clear, "
+    "compassionate language for both patients and clinicians, grounded in established "
+    "radiology and oncology knowledge. Respond in well-structured GitHub-flavored Markdown, "
+    "using exactly the section headings the user requests. Always remind the reader that your "
+    "output is for education only and is not a substitute for professional diagnosis."
 )
 
 _REPORT_PROMPT = """\
-A deep learning model (ResNet50 fine-tuned on the Brain Tumor MRI dataset, ~98.5% accuracy) \
-has analyzed a brain MRI scan and produced the following classification:
+A ResNet50 MRI brain-tumor classifier produced this result:
 
-**Primary finding:** {tumor_class} ({confidence:.1f}% confidence)
+Primary finding: {tumor_class} ({confidence:.1f}% confidence).
+Probabilities: Glioma {glioma:.1f}%, Meningioma {meningioma:.1f}%, \
+Pituitary {pituitary:.1f}%, No Tumor {notumor:.1f}%.
+A GradCAM heatmap highlighted the regions the model focused on.
 
-**All class probabilities:**
-- Glioma:      {glioma:.1f}%
-- Meningioma:  {meningioma:.1f}%
-- Pituitary:   {pituitary:.1f}%
-- No Tumor:    {notumor:.1f}%
-
-A GradCAM heatmap has also been computed, highlighting the image regions the model \
-focused on when making this prediction.
-
-Please generate a structured clinical report with exactly these five sections:
+Write a concise clinical report in Markdown with exactly these five sections, \
+2-4 sentences each:
 
 ## Diagnosis Summary
-State what was detected and the confidence level. Note whether the differential \
-diagnoses (other classes) were ruled out convincingly.
-
-## About This Condition
-Clinical characteristics of {tumor_class}: typical anatomical location, \
-growth pattern, malignancy risk, WHO grade (if applicable), and general prevalence.
-
-## What the GradCAM Heatmap Tells Us
-Explain that the colored overlay shows the regions the AI focused on. \
-Describe which brain regions are typically involved in {tumor_class} and \
-what a clinician should look for in those areas on an MRI.
-
+## About {tumor_class}
+## What the Heatmap Shows
 ## Recommended Next Steps
-List practical clinical actions in order of priority (e.g., specialist referral, \
-contrast MRI, biopsy, surveillance). Be specific to {tumor_class}.
-
 ## Important Disclaimer
-State clearly that this AI report is for educational and research purposes only \
-and must be reviewed and confirmed by a licensed radiologist or neurologist \
-before any medical decisions are made.
 
-Use clear, accessible language. Be informative and compassionate.\
+Write 1-3 short sentences per section and keep the whole report under 230 words. \
+Be accurate, clear, and compassionate. Do not wrap the report in code fences.\
 """
 
 
@@ -117,11 +117,12 @@ def generate_medical_report(pil_image, tumor_class, confidence_scores):
                 {"role": "user",   "content": prompt},
             ],
             options={
-                "temperature": 0.3,   # low temperature for factual medical text
-                "num_predict": 1024,  # max tokens to generate
+                "temperature": 0.3,     # low temperature for factual medical text
+                "num_predict": NUM_PREDICT,
+                "num_ctx": 2048,        # smaller context = less memory + faster
             },
         )
-        return response["message"]["content"]
+        return _strip_code_fence(response["message"]["content"])
 
     except ollama.ResponseError as exc:
         if "model" in str(exc).lower() or "not found" in str(exc).lower():
@@ -132,7 +133,8 @@ def generate_medical_report(pil_image, tumor_class, confidence_scores):
         return f"**Ollama error:** {exc}"
 
     except Exception as exc:
-        if "connection" in str(exc).lower() or "refused" in str(exc).lower():
+        msg = str(exc).lower()
+        if "connection" in msg or "refused" in msg or "connect" in msg:
             return (
                 "**Ollama server is not running.**\n\n"
                 "Start it with:\n```bash\nollama serve\n```"
@@ -140,12 +142,21 @@ def generate_medical_report(pil_image, tumor_class, confidence_scores):
         return f"**Report generation failed:** {exc}"
 
 
+def current_model():
+    """Return the configured Ollama model name (OLLAMA_MODEL env, default llama3.2:3b)."""
+    return OLLAMA_MODEL
+
+
 def llm_available():
-    """Return True if ollama is installed and the server appears reachable."""
+    """Return True if ollama is installed, the server is reachable, and the
+    configured model is actually pulled (so /report won't 404 the model)."""
     if not OLLAMA_AVAILABLE:
         return False
     try:
-        ollama.list()   # lightweight ping to the local server
-        return True
+        listed = ollama.list()
+        models = [m.get("model") or m.get("name") for m in listed.get("models", [])]
+        # Match exact tag or the base name (e.g. "llama3.2:3b" vs "llama3.2").
+        base = OLLAMA_MODEL.split(":")[0]
+        return any(m == OLLAMA_MODEL or (m or "").split(":")[0] == base for m in models)
     except Exception:
         return False
