@@ -1,0 +1,55 @@
+# NeuroScan — brain-tumor MRI classifier. Both services bind to localhost only;
+# the host nginx vhost (port 8086) is the public entrypoint and splits /api -> backend.
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: neuroscan-backend
+    container_name: neuroscan-backend
+    restart: unless-stopped
+    environment:
+      OMP_NUM_THREADS: "2"
+      # Reach the in-stack Ollama service for the local LLM clinical report.
+      OLLAMA_HOST: "http://ollama:11434"
+      OLLAMA_MODEL: "qwen2.5:1.5b-instruct-q4_K_M"
+    depends_on:
+      - ollama
+    ports:
+      - "127.0.0.1:8110:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+    image: neuroscan-frontend
+    container_name: neuroscan-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:3040:3000"
+
+  # Local LLM (no API key) for the clinical report. Internal-only — not published
+  # to the host. Tuned to stay light on this shared box: unload the model 2 min
+  # after the last request and never load more than one at a time.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: neuroscan-ollama
+    restart: unless-stopped
+    environment:
+      OLLAMA_KEEP_ALIVE: "2m"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+    volumes:
+      - ollama_models:/root/.ollama
+    expose:
+      - "11434"
+
+volumes:
+  ollama_models:

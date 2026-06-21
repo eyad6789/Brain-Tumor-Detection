@@ -1,0 +1,19 @@
+# Keep the backend build context small. model_class.pth + model_log.csv are kept.
+venv/
+frontend/
+.git/
+.github/
+.claude/
+__pycache__/
+**/__pycache__/
+*.pyc
+.ipynb_checkpoints/
+brain-tumor.ipynb
+*.png
+dataset/
+data/
+datasets/
+*.onnx
+*.h5
+*.pkl
+README.md

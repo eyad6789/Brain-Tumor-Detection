@@ -63,19 +63,22 @@
   --mesh-2: rgba(91, 84, 230, 0.08);
 }
 
-/* ───────────────────────── Dark theme (reading room) ──────────────────────── */
+/* ───────────────────────── Dark theme (reading room) ───────────────────────
+   Reworked for more depth: lifted background, clearer card elevation, more
+   legible borders/text, and a livelier accent glow so dark mode reads as
+   richly as light mode. Default accent = cyan; swap via [data-palette] below. */
 .dark {
-  --bg: #06080f;
-  --surface: #0b101d;
-  --surface-2: #0f1626;
-  --surface-3: #151e31;
-  --line: rgba(150, 168, 196, 0.13);
-  --line-strong: rgba(150, 168, 196, 0.26);
-  --ink: #c5d2e3;
-  --ink-strong: #f2f6fc;
-  --muted: #7e8da4;
+  --bg: #080b14;
+  --surface: #0e1422;
+  --surface-2: #131c30;
+  --surface-3: #1c2742;
+  --line: rgba(160, 178, 210, 0.16);
+  --line-strong: rgba(160, 178, 210, 0.30);
+  --ink: #c8d5e6;
+  --ink-strong: #f3f7fd;
+  --muted: #8694ac;
   --primary: #2cd4ee;        /* cyan glow */
-  --primary-soft: rgba(44, 212, 238, 0.14);
+  --primary-soft: rgba(44, 212, 238, 0.15);
   --accent: #8b7bff;         /* violet */
   --safe: #34d39a;
   --alert: #f3b740;
@@ -85,14 +88,80 @@
   --c-pituitary: #f3b740;
   --c-notumor: #34d39a;
 
-  --glass-bg: rgba(13, 19, 34, 0.55);
-  --glass-border: rgba(44, 212, 238, 0.16);
-  --grid-line: rgba(150, 170, 200, 0.06);
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.02), 0 24px 60px -30px rgba(0, 0, 0, 0.8);
-  --glow: 0 0 32px rgba(44, 212, 238, 0.18), 0 0 70px rgba(139, 123, 255, 0.1);
-  --scan-color: rgba(44, 212, 238, 0.7);
-  --mesh-1: rgba(44, 212, 238, 0.13);
-  --mesh-2: rgba(139, 123, 255, 0.12);
+  --glass-bg: rgba(14, 20, 34, 0.62);
+  --glass-border: rgba(44, 212, 238, 0.18);
+  --grid-line: rgba(150, 170, 200, 0.07);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03), 0 24px 60px -30px rgba(0, 0, 0, 0.85);
+  --glow: 0 0 34px rgba(44, 212, 238, 0.22), 0 0 80px rgba(139, 123, 255, 0.12);
+  --scan-color: rgba(44, 212, 238, 0.75);
+  --mesh-1: rgba(44, 212, 238, 0.16);
+  --mesh-2: rgba(139, 123, 255, 0.14);
+}
+
+/* ════════════════════════ Color palettes ════════════════════════
+   A second, independent theming dimension on <html data-palette="…">.
+   "cyan" is the default (the base :root / .dark values above). Each palette
+   only restyles the accent family (+ subtle surface tint in dark) so the whole
+   UI recolors while text stays readable. Light overrides are scoped with
+   :not(.dark) so they never beat the .dark accent rules. */
+
+/* ── Rose ── */
+:root[data-palette="rose"]:not(.dark) {
+  --primary: #d6336c; --primary-soft: #fde4ec; --accent: #7c4dff;
+  --scan-color: rgba(214, 51, 108, 0.5);
+  --mesh-1: rgba(214, 51, 108, 0.10); --mesh-2: rgba(124, 77, 255, 0.08);
+  --glass-border: rgba(214, 51, 108, 0.24);
+}
+.dark[data-palette="rose"] {
+  --bg: #0c0810; --surface: #160d18; --surface-2: #1d1322; --surface-3: #28182f;
+  --line: rgba(255, 184, 212, 0.15); --line-strong: rgba(255, 184, 212, 0.28);
+  --primary: #ff5d8f; --primary-soft: rgba(255, 93, 143, 0.16); --accent: #c08bff;
+  --glass-bg: rgba(22, 13, 24, 0.62); --glass-border: rgba(255, 93, 143, 0.18);
+  --glow: 0 0 34px rgba(255, 93, 143, 0.24), 0 0 80px rgba(192, 139, 255, 0.13);
+  --scan-color: rgba(255, 93, 143, 0.78);
+  --mesh-1: rgba(255, 93, 143, 0.17); --mesh-2: rgba(192, 139, 255, 0.14);
+}
+
+/* ── Violet ── */
+:root[data-palette="violet"]:not(.dark) {
+  --primary: #6d3bef; --primary-soft: #ece6fe; --accent: #0e8aa0;
+  --scan-color: rgba(109, 59, 239, 0.45);
+  --mesh-1: rgba(109, 59, 239, 0.10); --mesh-2: rgba(14, 138, 160, 0.08);
+  --glass-border: rgba(109, 59, 239, 0.22);
+}
+.dark[data-palette="violet"] {
+  --bg: #0a0814; --surface: #110e1f; --surface-2: #16132b; --surface-3: #1f1b3c;
+  --line: rgba(196, 184, 255, 0.15); --line-strong: rgba(196, 184, 255, 0.28);
+  --primary: #a78bff; --primary-soft: rgba(167, 139, 255, 0.16); --accent: #3dd6e6;
+  --glass-bg: rgba(17, 14, 31, 0.62); --glass-border: rgba(167, 139, 255, 0.18);
+  --glow: 0 0 34px rgba(167, 139, 255, 0.24), 0 0 80px rgba(61, 214, 230, 0.12);
+  --scan-color: rgba(167, 139, 255, 0.78);
+  --mesh-1: rgba(167, 139, 255, 0.18); --mesh-2: rgba(61, 214, 230, 0.12);
+}
+
+/* ── Emerald ── */
+:root[data-palette="emerald"]:not(.dark) {
+  --primary: #0f9d6e; --primary-soft: #d9f5ea; --accent: #0891a8;
+  --scan-color: rgba(15, 157, 110, 0.45);
+  --mesh-1: rgba(15, 157, 110, 0.10); --mesh-2: rgba(8, 145, 168, 0.08);
+  --glass-border: rgba(15, 157, 110, 0.22);
+}
+.dark[data-palette="emerald"] {
+  --bg: #06110d; --surface: #0c1a16; --surface-2: #11231d; --surface-3: #193029;
+  --line: rgba(150, 222, 192, 0.15); --line-strong: rgba(150, 222, 192, 0.28);
+  --primary: #34d39a; --primary-soft: rgba(52, 211, 154, 0.16); --accent: #2cd4ee;
+  --glass-bg: rgba(12, 26, 22, 0.62); --glass-border: rgba(52, 211, 154, 0.18);
+  --glow: 0 0 34px rgba(52, 211, 154, 0.22), 0 0 80px rgba(44, 212, 238, 0.12);
+  --scan-color: rgba(52, 211, 154, 0.72);
+  --mesh-1: rgba(52, 211, 154, 0.16); --mesh-2: rgba(44, 212, 238, 0.12);
+}
+
+/* Smooth the recolor when switching palettes (not on light/dark toggle, which
+   next-themes already freezes). */
+@media (prefers-reduced-motion: no-preference) {
+  body, .panel, .glass, .skeleton {
+    transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
 }
 
 /* ───────────────────────────── Base ───────────────────────────── */

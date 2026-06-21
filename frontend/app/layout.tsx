@@ -7,6 +7,10 @@ import { DisclaimerBanner } from "@/components/shared/DisclaimerBanner";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import {
+  PaletteProvider,
+  PALETTE_NO_FLASH_SCRIPT,
+} from "@/components/theme/PaletteProvider";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -31,12 +35,15 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable} ${bricolage.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <script dangerouslySetInnerHTML={{ __html: PALETTE_NO_FLASH_SCRIPT }} />
         <div className="app-atmosphere" aria-hidden />
         <ThemeProvider>
-          <Navbar />
-          <DisclaimerBanner variant="strip" />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <PaletteProvider>
+            <Navbar />
+            <DisclaimerBanner variant="strip" />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </PaletteProvider>
         </ThemeProvider>
       </body>
     </html>

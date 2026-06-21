@@ -1,0 +1,36 @@
+# NeuroScan backend — FastAPI + PyTorch (CPU) inference, GradCAM heatmaps.
+# Build context = repo ROOT (needs model_class.pth + the shared root modules).
+FROM python:3.12-slim
+
+# Runtime libs: libgomp1 for PyTorch/OpenMP, libglib2.0-0 for opencv (grad-cam).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libgomp1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    OMP_NUM_THREADS=2 \
+    MODEL_PATH=model_class.pth \
+    MODEL_LOG_PATH=model_log.csv
+
+# Torch is intentionally NOT in requirements.txt (see its header note). Pin to the
+# CPU wheels matching the version model_class.pth was saved under (2.6.0 / 0.21.0).
+RUN pip install --no-cache-dir \
+        torch==2.6.0 torchvision==0.21.0 \
+        --index-url https://download.pytorch.org/whl/cpu
+
+COPY backend/requirements.txt backend/requirements.txt
+# grad-cam depends on the full opencv-python (needs GUI libs like libxcb/libGL).
+# Force the headless build only so cv2 imports in a slim, server image.
+RUN pip install --no-cache-dir -r backend/requirements.txt \
+    && pip uninstall -y opencv-python opencv-python-headless \
+    && pip install --no-cache-dir opencv-python-headless
+
+# Shared core + weights + backend package (root .dockerignore trims the rest).
+COPY inference_core.py gradcam_utils.py llm_report.py model_class.pth model_log.csv ./
+COPY backend/ backend/
+
+EXPOSE 8000
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

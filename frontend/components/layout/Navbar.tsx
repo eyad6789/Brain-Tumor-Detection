@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 import { Logo } from "@/components/shared/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { PaletteToggle } from "@/components/theme/PaletteToggle";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -76,6 +77,7 @@ export function Navbar() {
           >
             New scan
           </Link>
+          <PaletteToggle className="hidden sm:flex" />
           <ThemeToggle />
           <button
             type="button"
@@ -113,6 +115,10 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <div className="mt-2 flex items-center justify-between border-t border-line px-3 pt-3">
+                <span className="text-sm font-medium text-muted">Color palette</span>
+                <PaletteToggle />
+              </div>
             </div>
           </motion.div>
         )}
