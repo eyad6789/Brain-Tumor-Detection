@@ -211,6 +211,10 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:34px;paddi
 @media print{
   body{background:#fff;font-size:11.5pt;}
   .wrap{max-width:none;padding:0;}
+  /* On paper the column is narrower than on screen and there is no horizontal
+     scrollbar, so a long code line would be silently clipped. Shrink it and let
+     it wrap as a last resort — losing a character is worse than a soft wrap. */
+  pre{font-size:8.6pt;line-height:1.45;white-space:pre-wrap;overflow-wrap:break-word;}
   section,.toc{box-shadow:none;border-color:#d8e0ec;break-inside:avoid;}
   .cover{padding:48px 22px;}
   section{margin:12px 0;}

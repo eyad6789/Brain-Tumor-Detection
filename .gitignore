@@ -6,3 +6,16 @@ __pycache__/
 .DS_Store
 .venv/
 **/.venv/
+
+# safety net: secrets, local data, deps, build noise
+node_modules/
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.playwright-mcp/
+.waraq-uploads/
+*.zip

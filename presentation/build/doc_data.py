@@ -186,6 +186,42 @@ SECTIONS.append({
         "originally trained on (ImageNet).",
         "تُحجَّم كل صورة وتُطبَّع لتبدو تمامًا كالبيانات التي دُرِّبت عليها شبكة ResNet50 أصلًا (ImageNet)."),
     "blocks": [
+        {"type": "h", "text": L("The dataset, by the numbers", "المجموعة بالأرقام")},
+        {"type": "p", "text": L(
+            "The data is the Brain Tumor MRI Images dataset from Kaggle, downloaded by "
+            "download_dataset.py via kagglehub (no API-key file needed). It arrives pre-split into "
+            "Training and Testing folders, one sub-folder per class. The exact counts, read from the "
+            "outputs preserved in brain-tumor.ipynb, are:",
+            "البيانات هي مجموعة صور الرنين المغناطيسي لأورام الدماغ من Kaggle، يُنزّلها "
+            "download_dataset.py عبر kagglehub (بلا حاجة إلى ملف مفتاح API). وتصل مقسَّمة مسبقًا إلى "
+            "مجلدَي تدريب واختبار، بمجلد فرعي لكل فئة. والأعداد الدقيقة، مقروءةً من المخرجات "
+            "المحفوظة في brain-tumor.ipynb، هي:")},
+        {"type": "table",
+         "head": [L("Class", "الفئة"), L("Training", "التدريب"), L("Testing", "الاختبار"),
+                  L("Share of training set", "نسبتها من مجموعة التدريب")],
+         "rows": [
+            [L("Pituitary", "نخامي"), L("1,457", "1,457"), L("300", "300"), L("25.5%", "25.5%")],
+            [L("No Tumor", "لا ورم"), L("1,595", "1,595"), L("405", "405"), L("27.9%", "27.9%")],
+            [L("Meningioma", "سحائي"), L("1,339", "1,339"), L("306", "306"), L("23.4%", "23.4%")],
+            [L("Glioma", "دبقي"), L("1,321", "1,321"), L("300", "300"), L("23.1%", "23.1%")],
+            [L("Total", "الإجمالي"), L("5,712", "5,712"), L("1,311", "1,311"), L("100%", "100%")],
+        ]},
+        {"type": "callout", "tone": "good",
+         "title": L("The classes are naturally balanced", "الفئات متوازنة طبيعيًا"),
+         "text": L(
+            "Every class holds between 23% and 28% of the training set. That balance matters: with a "
+            "badly skewed dataset, a model can score high accuracy simply by always predicting the "
+            "majority class, and class weighting or resampling would have been required. Here it was "
+            "not — which is one reason plain accuracy is a semi-reasonable headline figure for this "
+            "particular dataset, even though it is still the wrong metric clinically.",
+            "تحوي كل فئة بين 23% و28% من مجموعة التدريب. وهذا التوازن مهم: ففي مجموعة شديدة الميل "
+            "يستطيع نموذج تحقيق دقة عالية بمجرد التنبؤ دائمًا بالفئة الأكثر، وكان سيلزم ترجيح "
+            "الفئات أو إعادة المعاينة. ولم يلزم هنا — وهذا أحد أسباب كون الدقة المجرّدة رقمًا بارزًا "
+            "شبه معقول لهذه المجموعة تحديدًا، وإن ظلّت المقياس الخاطئ سريريًا.")},
+        {"type": "p", "text": L(
+            "With a batch size of 32, one epoch over 5,712 training images is 179 gradient updates.",
+            "وبحجم دفعة 32، تساوي الحقبة الواحدة على 5712 صورة تدريب 179 تحديثًا للتدرّج.")},
+        {"type": "h", "text": L("Preprocessing", "المعالجة المسبقة")},
         {"type": "p", "text": L(
             "The model expects a 224×224 RGB image. The inference transform (the canonical TRANSFORM in "
             "inference_core.py) applies three deterministic steps:",
@@ -835,6 +871,82 @@ SECTIONS.append({
             [L("Early stopping", "الإيقاف المبكر"),
              L("Halting training when validation performance stops improving, to avoid overfitting.",
                "إيقاف التدريب عند توقّف تحسّن أداء التحقق، لتجنّب فرط التخصيص.")],
+            [L("Kernel / filter", "النواة / المرشّح"),
+             L("The small window of weights (usually 3×3) that a convolutional layer slides across "
+               "the image to detect one kind of pattern.",
+               "نافذة الأوزان الصغيرة (عادةً 3×3) التي تُمرِّرها الطبقة الالتفافية على الصورة لكشف "
+               "نوع واحد من الأنماط.")],
+            [L("Feature map", "خريطة السمات"),
+             L("The grid of numbers a single kernel produces after sweeping the whole input — one "
+               "map per kernel.",
+               "شبكة الأرقام التي تنتجها نواة واحدة بعد مسح المدخل كله — خريطة لكل نواة.")],
+            [L("Receptive field", "المجال الاستقبالي"),
+             L("How much of the original image one neuron deep in the network can \"see\". It grows "
+               "with every layer.",
+               "مقدار ما يستطيع عصبون عميق في الشبكة «رؤيته» من الصورة الأصلية. ويتّسع مع كل طبقة.")],
+            [L("ReLU", "ReLU"),
+             L("max(0, x) — the non-linear function applied after each convolution.",
+               "‏max(0, x) — الدالة غير الخطية المطبَّقة بعد كل التفاف.")],
+            [L("Pooling", "التجميع"),
+             L("Shrinking a feature map by summarizing each small region with one number.",
+               "تقليص خريطة السمات بتلخيص كل منطقة صغيرة برقم واحد.")],
+            [L("Batch normalization", "التطبيع الدُّفعي"),
+             L("Re-centring and re-scaling activations per channel so deep networks train stably.",
+               "إعادة توسيط التنشيطات وتحجيمها لكل قناة ليتدرّب العميق باستقرار.")],
+            [L("Fine-tuning", "الضبط الدقيق"),
+             L("Continuing to train some layers of a pretrained network on a new task, while others "
+               "stay frozen.",
+               "متابعة تدريب بعض طبقات شبكة مُدرَّبة مسبقًا على مهمة جديدة، مع بقاء غيرها مجمَّدًا.")],
+            [L("Label smoothing", "تنعيم التسميات"),
+             L("Replacing a hard target of 1.0 with something like 0.925, so the model does not "
+               "become absurdly over-confident.",
+               "استبدال هدف حادّ قيمته 1.0 بقيمة نحو 0.925، فلا يصير النموذج مفرط الثقة بصورة "
+               "سخيفة.")],
+            [L("Weight decay (L2)", "اضمحلال الوزن (L2)"),
+             L("A penalty on large weights that pushes the model toward a simpler, smoother "
+               "function.",
+               "عقوبة على الأوزان الكبيرة تدفع النموذج نحو دالة أبسط وأنعم.")],
+            [L("Data augmentation", "زيادة البيانات"),
+             L("Randomly transforming training images (flip, rotate, blur) so the model sees more "
+               "variety than the dataset actually contains.",
+               "تحويل صور التدريب عشوائيًا (قلب، تدوير، تشويش) ليرى النموذج تنوّعًا أكبر مما تحويه "
+               "المجموعة فعلًا.")],
+            [L("Data leakage", "تسريب البيانات"),
+             L("When information from the evaluation set influences training or model selection, "
+               "making the reported score optimistic. This project has a documented instance of it.",
+               "أن تؤثّر معلومات من مجموعة التقييم في التدريب أو اختيار النموذج، فتصير الدرجة "
+               "المُبلَّغة متفائلة. وفي هذا المشروع حالة موثَّقة منه.")],
+            [L("Calibration", "المعايرة"),
+             L("Making a model's stated confidence match its real accuracy, so \"90%\" means right "
+               "nine times out of ten.",
+               "جعل ثقة النموذج المُعلنة تطابق دقّته الحقيقية، فتعني «90%» أنه مصيب تسع مرات من "
+               "عشر.")],
+            [L("Out-of-distribution (OOD)", "الخروج عن التوزيع"),
+             L("An input unlike anything in the training data. The model still answers confidently, "
+               "which is why OOD detection matters.",
+               "مدخل لا يشبه أي شيء في بيانات التدريب. ويجيب النموذج بثقة رغم ذلك، ولهذا يهمّ كشف "
+               "الخروج عن التوزيع.")],
+            [L("Confusion matrix", "مصفوفة الالتباس"),
+             L("A grid of true class against predicted class, showing exactly which classes get "
+               "mistaken for which.",
+               "شبكة تضع الفئة الحقيقية مقابل المتوقَّعة، وتُظهر بالضبط أي الفئات يُخلَط بأيّها.")],
+            [L("Recall / sensitivity", "الاستدعاء / الحساسية"),
+             L("Of all the real cases of a class, the fraction the model caught. The number that "
+               "matters most in screening.",
+               "من كل الحالات الحقيقية لفئة ما، النسبة التي التقطها النموذج. وهو الرقم الأهمّ في "
+               "المسح.")],
+            [L("Inference", "الاستدلال"),
+             L("Using a trained model to make a prediction, as opposed to training it.",
+               "استخدام نموذج مدرَّب لإجراء تنبؤ، في مقابل تدريبه.")],
+            [L("Quantization", "التكميم"),
+             L("Storing a model's weights at lower precision (e.g. 4-bit) so it runs on smaller "
+               "hardware — how the local LLM fits in ~4 GB.",
+               "تخزين أوزان النموذج بدقة أقل (مثل 4 بتّات) ليعمل على عتاد أصغر — وهكذا يتّسع النموذج "
+               "اللغوي المحلي في نحو 4 غيغابايت.")],
+            [L("SaMD", "برمجيات كجهاز طبي (SaMD)"),
+             L("Software as a Medical Device — the regulatory category any tool that informs a "
+               "diagnosis falls into.",
+               "الفئة التنظيمية التي تندرج تحتها أي أداة تُفيد في التشخيص.")],
         ]},
     ],
 })
@@ -876,3 +988,9 @@ SECTIONS.append({
             "‏NeuroScan للتعليم والبحث فقط. وهو ليس جهازًا طبيًا ويجب ألا يُستخدم للتشخيص.")},
     ],
 })
+
+# ── Splice in the extended deep-dive sections and renumber everything ────
+# Section numbers above are placeholders; doc_extra.splice() is the authority.
+import doc_extra  # noqa: E402  (must run after SECTIONS is fully built)
+
+doc_extra.splice(SECTIONS)
